@@ -1,0 +1,50 @@
+  - id: stations
+    geometry: point
+    <<: *extents
+    Datasource:
+      <<: *osm2pgsql
+      table: |-
+        (SELECT
+            way,
+            name,
+            ref,
+            railway,
+            aerialway,
+            station
+          FROM
+          (SELECT
+              ST_PointOnSurface(way) AS way,
+              localized_name_second as name,
+              ref,
+              railway,
+              aerialway,
+              tags->'station' AS station,
+              way_area
+            FROM planet_osm_polygon
+            WHERE way && !bbox!
+          UNION ALL
+          SELECT
+              way,
+              localized_name_second as name,
+              ref,
+              railway,
+              aerialway,
+              tags->'station' AS station,
+              NULL as way_area
+            FROM planet_osm_point
+            WHERE way && !bbox!
+            ) _
+          WHERE railway IN ('station', 'halt', 'tram_stop')
+            OR railway = 'subway_entrance' AND way_area IS NULL
+            OR aerialway = 'station'
+          ORDER BY
+            CASE railway
+              WHEN 'station' THEN 1
+              WHEN 'subway_entrance' THEN 3
+              ELSE 2
+            END,
+            way_area DESC NULLS LAST
+        ) AS stations
+    properties:
+      cache-features: true
+      minzoom: 12

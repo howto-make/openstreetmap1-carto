@@ -1,0 +1,10 @@
+  - id: rivers-z5
+    geometry: "polygon"
+    <<: *extents
+    Datasource:
+      file: "data/river-polygons-reduced-3857/river_reduced_z5.shp"
+      type: "shape"
+    properties:
+      minzoom: 5
+      maxzoom: 5
+    advanced: {}
