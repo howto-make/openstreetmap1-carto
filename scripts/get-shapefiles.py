@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # This script generates and populates the 'data' directory with all needed
 # shapefiles.
